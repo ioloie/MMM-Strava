@@ -26,7 +26,8 @@ Module.register("MMM-Strava", {
 		animationSpeed: 2.5 * 1000, // 2.5 seconds
 		debug: false, // Set to true to enable extending logging
 		digits: 1, // digits for distance and elevation
-		firstYear: new Date().getFullYear() - 4 // first year to group activities by in chart mode when the period is 'all'
+		firstYear: new Date().getFullYear() - 4, // first year to group activities by in chart mode when the period is 'all'
+		showPrivateStats: false, // Set to true to include private activities in stats
 	},
 	/**
 	 * @member {boolean} loading - Flag to indicate the loading state of the module.

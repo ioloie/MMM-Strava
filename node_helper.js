@@ -241,7 +241,11 @@ module.exports = NodeHelper.create({
 					// Get athelete Id
 					const athleteId = this.tokens[moduleConfig.client_id].token.athlete.id;
 					// Call api
-					this.getAthleteStats(moduleIdentifier, accessToken, athleteId);
+					if (moduleConfig.showPrivateStats) {
+						this.getAllAthleteStats(moduleIdentifier, accessToken);
+				} else {
+						this.getAthleteStats(moduleIdentifier, accessToken, athleteId);
+				}
 				} catch (error) {
 					this.log(`Athete id not found for ${moduleIdentifier}`);
 				}
@@ -283,6 +287,35 @@ module.exports = NodeHelper.create({
 		if (apiData) {
 			self.sendSocketNotification("DATA", { identifier: moduleIdentifier, data: apiData });
 		}
+	},
+	  /**
+     * @function getAllAthleteStats
+     * @description get stats for an athlete from the API
+     *
+     * @param {string} moduleIdentifier - The module identifier.
+     * @param {string} accessToken
+     */
+    getAllAthleteStats: async function (moduleIdentifier, accessToken) {
+			this.log("Getting athlete stats for " + moduleIdentifier);
+			var self = this;
+			var sumList;
+			var activityList;
+			var i = 0;
+			do {
+					i++;
+					activityList = await strava.athlete.listActivities({ "access_token": accessToken, "page": i, "per_page": 200 });
+					if (sumList) {
+							sumList = sumList.concat(activityList);
+					} else {
+							sumList = activityList;
+					}
+			}
+			while (activityList.length > 0);
+			var data = {
+					"identifier": moduleIdentifier,
+					"data": self.summariseStats(moduleIdentifier, sumList)
+			};
+			self.sendSocketNotification("DATA", data);
 	},
 	/**
 	 * @function getAthleteActivities
